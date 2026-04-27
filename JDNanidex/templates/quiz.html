@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Quiz Animé{% endblock %}
+
+{% block content %}
+<div class="inner-wrap active" id="quiz-wrap">
+  <a href="{{ url_for('index') }}" class="btn-back">← Retour</a>
+
+  <div class="quiz-topbar">
+    <div class="score-chip">
+      <span style="font-size:1.1rem">⭐</span>
+      <div>
+        <div class="score-chip-v" id="score-v">0</div>
+        <div class="score-chip-l">SCORE</div>
+      </div>
+    </div>
+    <div class="prog-block">
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-label" id="prog-lbl">1 / {{ questions|length }}</div>
+    </div>
+  </div>
+
+  <div id="quiz-body"></div>
+
+  <div class="quiz-nav">
+    <button class="btn-q btn-nxt" id="btn-nxt" onclick="nextQ()">Suivant →</button>
+    <button class="btn-q btn-fin" id="btn-fin" onclick="endQuiz()">Terminer ✓</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Questions injectées depuis Flask (côté serveur)
+const QUESTIONS = {{ questions | tojson }};
+let qi = 0, score = 0, answered = false;
+
+function renderQ() {
+  const q = QUESTIONS[qi], n = QUESTIONS.length;
+  document.getElementById('prog-fill').style.width = ((qi+1)/n*100) + '%';
+  document.getElementById('prog-lbl').textContent = (qi+1) + ' / ' + n;
+  answered = false;
+  document.getElementById('btn-nxt').classList.remove('show');
+  document.getElementById('btn-fin').classList.remove('show');
+  const L = ['A','B','C','D'];
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="q-card" style="animation:slideIn .3s ease">
+      <span class="q-cat">📂 ${q.cat}</span>
+      <div class="q-text">${q.text}</div>
+      <div class="opts">${q.opts.map((o,i) => `
+        <button class="opt" onclick="answer(this,'${o.replace(/'/g,"\\'")}')">
+          <span class="opt-ltr">${L[i]}</span><span>${o}</span>
+        </button>`).join('')}
+      </div>
+      <div class="fb" id="fb"></div>
+    </div>`;
+}
+
+function answer(btn, chosen) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[qi];
+  const ok = chosen === q.ans;
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    const t = b.querySelector('span:last-child').textContent;
+    if (t === q.ans) b.classList.add('correct');
+    else if (b === btn && !ok) b.classList.add('wrong');
+  });
+  if (ok) { score++; document.getElementById('score-v').textContent = score; }
+  const fb = document.getElementById('fb');
+  fb.className = 'fb ' + (ok ? 'ok' : 'ko') + ' show';
+  fb.innerHTML = ok
+    ? '✓ Correct ! ' + q.expl
+    : '✗ Incorrect. Bonne réponse : <strong>' + q.ans + '</strong>. ' + q.expl;
+  if (qi === QUESTIONS.length - 1) document.getElementById('btn-fin').classList.add('show');
+  else document.getElementById('btn-nxt').classList.add('show');
+}
+
+function nextQ() { qi++; renderQ(); }
+
+async function endQuiz() {
+  document.getElementById('quiz-wrap').style.display = 'none';
+  showProc();
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ mode: 'quiz', score: score })
+    });
+    const data = await res.json();
+    setTimeout(() => showResults(data, 'Quiz', score), 1000);
+  } catch(e) {
+    setTimeout(() => showResults({
+      profil: score >= 7 ? 'Fan Shōnen' : 'Fan Casual',
+      emoji: '🌊', confiance: 80,
+      resume: `Score ${score}/10. Continuez à explorer !`,
+      tags: ['anime','quiz'], scoreMsg: 'Bien joué !',
+      recommandations: [{titre:'Attack on Titan',genre:'Action'}]
+    }, 'Quiz', score), 2500);
+  }
+}
+
+// Démarrer
+renderQ();
+</script>
+{% endblock %}

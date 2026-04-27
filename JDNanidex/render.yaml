@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: jdn-anidex
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jdn-anidex-db
+          property: connectionString
+
+databases:
+  - name: jdn-anidex-db
+    databaseName: jdn_anidex
+    plan: free

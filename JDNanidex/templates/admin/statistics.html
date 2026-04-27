@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% block title %}Admin — Analyse Statistique{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <div class="aside">
+    <div class="aside-logo">
+      <svg width="26" height="26" viewBox="0 0 44 44" fill="none">
+        <ellipse cx="22" cy="10" rx="13" ry="4.2" fill="url(#as1)"/>
+        <rect x="9" y="10" width="26" height="10" fill="url(#as1)" opacity=".6"/>
+        <ellipse cx="22" cy="20" rx="13" ry="4.2" fill="url(#as1)" opacity=".7"/>
+        <circle cx="22" cy="20" r="3.4" fill="url(#as2)"/>
+        <circle cx="22" cy="20" r="1.5" fill="#04040e"/>
+        <defs>
+          <linearGradient id="as1" x1="9" y1="0" x2="35" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></linearGradient>
+          <radialGradient id="as2"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></radialGradient>
+        </defs>
+      </svg>
+      <div class="aside-logo-name">JDN AniDex</div>
+    </div>
+    <div class="aside-sec">Navigation</div>
+    <a href="{{ url_for('admin_dashboard') }}"   class="aside-item">🎯 Questions Quiz</a>
+    <a href="{{ url_for('admin_responses') }}"   class="aside-item">📊 Réponses & Profils</a>
+    <a href="{{ url_for('admin_statistics') }}"  class="aside-item active">📈 Analyse Statistique</a>
+    <a href="{{ url_for('export_csv') }}"        class="aside-item">📥 Export CSV</a>
+    <div class="aside-sec">Compte</div>
+    <a href="{{ url_for('admin_logout') }}"      class="aside-item">🚪 Déconnexion</a>
+  </div>
+
+  <div class="admin-main" style="padding:2rem;">
+    <div class="adm-topbar">
+      <div class="adm-title">📈 Analyse Statistique</div>
+      <button class="btn-add" onclick="loadStats()">↻ Actualiser</button>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="stats-row" id="kpi-row">
+      <div class="stat-c"><div class="stat-l">Participants</div><div class="stat-v" id="kpi-total">—</div><div class="stat-s">total</div></div>
+      <div class="stat-c"><div class="stat-l">Score moyen</div><div class="stat-v" id="kpi-avg">—</div><div class="stat-s">/ 10</div></div>
+      <div class="stat-c"><div class="stat-l">Écart-type</div><div class="stat-v" id="kpi-std">—</div><div class="stat-s">dispersion</div></div>
+      <div class="stat-c"><div class="stat-l">Médiane</div><div class="stat-v" id="kpi-med">—</div><div class="stat-s">/ 10</div></div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;">
+
+      <!-- Distribution des scores -->
+      <div class="stat-card">
+        <div class="stat-card-title">Distribution des Scores (Quiz)</div>
+        <canvas id="chartScores" height="220"></canvas>
+      </div>
+
+      <!-- Répartition des profils -->
+      <div class="stat-card">
+        <div class="stat-card-title">Répartition des Profils</div>
+        <canvas id="chartProfils" height="220"></canvas>
+      </div>
+
+      <!-- Tendance temporelle -->
+      <div class="stat-card">
+        <div class="stat-card-title">Participation (7 derniers jours)</div>
+        <canvas id="chartTrend" height="220"></canvas>
+      </div>
+
+      <!-- Quiz vs Sondage -->
+      <div class="stat-card">
+        <div class="stat-card-title">Mode de Participation</div>
+        <canvas id="chartMode" height="220"></canvas>
+      </div>
+    </div>
+
+    <!-- Tableau stats détaillées -->
+    <div class="stat-card" style="margin-top:1.5rem;">
+      <div class="stat-card-title">Statistiques Descriptives Détaillées</div>
+      <table class="stat-table" id="detail-table">
+        <thead>
+          <tr><th>Indicateur</th><th>Valeur</th><th>Description</th></tr>
+        </thead>
+        <tbody id="detail-body">
+          <tr><td colspan="3" style="text-align:center;color:var(--mut)">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Catégories populaires -->
+    <div class="stat-card" style="margin-top:1.5rem;">
+      <div class="stat-card-title">Genres / Catégories Recommandés</div>
+      <div id="genres-chart" style="display:flex;flex-wrap:wrap;gap:.6rem;padding:.5rem 0;"></div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.stat-card {
+  background: var(--card, #0d0d1a);
+  border: 1px solid var(--bdr, rgba(255,255,255,.08));
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+}
+.stat-card-title {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--mut, #888);
+  margin-bottom: 1rem;
+}
+.stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+.stat-table th {
+  text-align: left;
+  padding: .5rem .75rem;
+  border-bottom: 1px solid var(--bdr, rgba(255,255,255,.08));
+  color: var(--mut, #888);
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.stat-table td {
+  padding: .55rem .75rem;
+  border-bottom: 1px solid var(--bdr, rgba(255,255,255,.05));
+}
+.stat-table tr:last-child td { border-bottom: none; }
+.genre-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(191,0,255,.12);
+  border: 1px solid rgba(191,0,255,.25);
+  border-radius: 999px;
+  padding: .3rem .8rem;
+  font-size: .8rem;
+  font-weight: 600;
+}
+.genre-pill span { color: var(--mut, #888); font-size: .72rem; font-weight: 400; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let charts = {};
+
+const COLORS = [
+  'rgba(191,0,255,0.8)',
+  'rgba(0,85,255,0.8)',
+  'rgba(0,210,255,0.8)',
+  'rgba(255,80,180,0.8)',
+  'rgba(255,180,0,0.8)',
+  'rgba(0,255,160,0.8)',
+];
+const BORDER = COLORS.map(c => c.replace('0.8','1'));
+
+Chart.defaults.color = '#888';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+async function loadStats() {
+  const res = await fetch('/admin/api/statistics');
+  const d = await res.json();
+
+  // KPIs
+  document.getElementById('kpi-total').textContent = d.total;
+  document.getElementById('kpi-avg').textContent   = d.score_stats.mean ?? '—';
+  document.getElementById('kpi-std').textContent   = d.score_stats.std  ?? '—';
+  document.getElementById('kpi-med').textContent   = d.score_stats.median ?? '—';
+
+  // Chart 1 — Distribution scores
+  destroyChart('scores');
+  const ctxS = document.getElementById('chartScores').getContext('2d');
+  const labels = Object.keys(d.score_distribution).map(k => `${k}/10`);
+  const values = Object.values(d.score_distribution);
+  charts.scores = new Chart(ctxS, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Participants',
+        data: values,
+        backgroundColor: labels.map((_, i) => {
+          const v = parseInt(labels[i]);
+          return v >= 8 ? 'rgba(0,255,160,0.7)' : v >= 5 ? 'rgba(0,85,255,0.7)' : 'rgba(191,0,255,0.7)';
+        }),
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { stepSize: 1 }, beginAtZero: true },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Chart 2 — Profils
+  destroyChart('profils');
+  const ctxP = document.getElementById('chartProfils').getContext('2d');
+  charts.profils = new Chart(ctxP, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(d.profiles),
+      datasets: [{
+        data: Object.values(d.profiles),
+        backgroundColor: COLORS,
+        borderColor: BORDER,
+        borderWidth: 2,
+        hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Chart 3 — Tendance 7 jours
+  destroyChart('trend');
+  const ctxT = document.getElementById('chartTrend').getContext('2d');
+  charts.trend = new Chart(ctxT, {
+    type: 'line',
+    data: {
+      labels: d.trend.map(t => t.date),
+      datasets: [{
+        label: 'Participations',
+        data: d.trend.map(t => t.count),
+        borderColor: 'rgba(191,0,255,1)',
+        backgroundColor: 'rgba(191,0,255,0.12)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: 'rgba(191,0,255,1)',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+
+  // Chart 4 — Mode
+  destroyChart('mode');
+  const ctxM = document.getElementById('chartMode').getContext('2d');
+  charts.mode = new Chart(ctxM, {
+    type: 'pie',
+    data: {
+      labels: ['Quiz', 'Sondage'],
+      datasets: [{
+        data: [d.mode_distribution.quiz || 0, d.mode_distribution.sondage || 0],
+        backgroundColor: ['rgba(0,85,255,0.8)', 'rgba(191,0,255,0.8)'],
+        borderColor: ['rgba(0,85,255,1)', 'rgba(191,0,255,1)'],
+        borderWidth: 2,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+    }
+  });
+
+  // Table détaillée
+  const tbody = document.getElementById('detail-body');
+  const ss = d.score_stats;
+  const rows = [
+    ['Total participants', d.total, 'Nombre total de réponses enregistrées'],
+    ['Participants quiz', d.mode_distribution.quiz || 0, 'Ayant complété le quiz'],
+    ['Participants sondage', d.mode_distribution.sondage || 0, 'Ayant complété le sondage'],
+    ['Score moyen', ss.mean ?? 'N/A', 'Moyenne arithmétique des scores /10'],
+    ['Score médian', ss.median ?? 'N/A', '50% des scores sont en-dessous de cette valeur'],
+    ['Écart-type', ss.std ?? 'N/A', 'Mesure de dispersion des scores'],
+    ['Score minimum', ss.min ?? 'N/A', 'Score le plus bas obtenu'],
+    ['Score maximum', ss.max ?? 'N/A', 'Score le plus élevé obtenu'],
+    ['Profil dominant', d.top_profile || 'N/A', 'Profil le plus fréquemment attribué'],
+  ];
+  tbody.innerHTML = rows.map(([ind, val, desc]) =>
+    `<tr><td><strong>${ind}</strong></td><td style="color:rgba(191,0,255,1);font-weight:700">${val}</td><td style="color:var(--mut)">${desc}</td></tr>`
+  ).join('');
+
+  // Genres
+  const gc = document.getElementById('genres-chart');
+  gc.innerHTML = '';
+  const genres = d.top_genres || [];
+  if (genres.length === 0) {
+    gc.innerHTML = '<span style="color:var(--mut);font-size:.85rem">Aucune recommandation enregistrée pour l\'instant.</span>';
+  } else {
+    genres.forEach(([genre, count]) => {
+      gc.innerHTML += `<div class="genre-pill">${genre} <span>${count}×</span></div>`;
+    });
+  }
+}
+
+loadStats();
+</script>
+{% endblock %}

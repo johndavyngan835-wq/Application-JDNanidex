@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Admin — Connexion{% endblock %}
+
+{% block content %}
+<div class="login-wrap active">
+  <div class="login-card">
+    <div class="login-logo-wrap">
+      <svg width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <ellipse cx="22" cy="10" rx="13" ry="4.2" fill="url(#la1)"/>
+        <rect x="9" y="10" width="26" height="10" fill="url(#la1)" opacity=".6"/>
+        <ellipse cx="22" cy="20" rx="13" ry="4.2" fill="url(#la1)" opacity=".7"/>
+        <ellipse cx="22" cy="20" rx="9.5" ry="5.8" fill="#07071a"/>
+        <ellipse cx="22" cy="20" rx="9.5" ry="5.8" fill="none" stroke="url(#la2)" stroke-width="1.3"/>
+        <circle cx="22" cy="20" r="3.4" fill="url(#la3)"/>
+        <circle cx="22" cy="20" r="1.5" fill="#04040e"/>
+        <circle cx="23.3" cy="18.8" r=".65" fill="rgba(255,255,255,.75)"/>
+        <defs>
+          <linearGradient id="la1" x1="9" y1="0" x2="35" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></linearGradient>
+          <linearGradient id="la2" x1="13" y1="14" x2="31" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#00ccff"/></linearGradient>
+          <radialGradient id="la3"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></radialGradient>
+        </defs>
+      </svg>
+      <div class="login-name">JDN AniDex Admin</div>
+    </div>
+    <div class="login-sub">Panneau d'administration</div>
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <div class="l-field">
+        <label>Identifiant</label>
+        <input type="text" name="username" placeholder="admin" required autocomplete="username">
+      </div>
+      <div class="l-field">
+        <label>Mot de passe</label>
+        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="l-btn">Se connecter</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

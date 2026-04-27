@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="orb orb3"></div><div class="orb orb4"></div>
+  <div class="kj kj1">データ</div><div class="kj kj2">知</div>
+  <div class="kj kj3">愛</div><div class="kj kj4">夢</div>
+
+  <div class="hero-tag">
+    <span class="tag-dot"></span>
+    Plateforme Animé · Quiz · Profil Fan
+  </div>
+
+  <h1 class="hero-title">
+    <span class="ht-jdn">JDN</span>
+    <span class="ht-anidex">AniDex</span>
+  </h1>
+
+  <p class="hero-slogan">"Toute la data des animés, <span class="hl">en un seul endroit.</span>"</p>
+  <p class="hero-sub">
+    Testez vos connaissances sur des milliers d'animés du monde entier
+    et découvrez votre profil de fan unique.
+  </p>
+
+  <div class="mode-cards">
+    <a href="{{ url_for('quiz') }}" class="mode-card mc-q" style="text-decoration:none">
+      <div class="mc-bar"></div>
+      <div class="mc-icon">⚔️</div>
+      <div class="mc-title">Quiz Animé</div>
+      <p class="mc-desc">10 questions aléatoires parmi des centaines d'animés de tous genres et pays.</p>
+      <span class="mc-cta">Lancer →</span>
+    </a>
+    <a href="{{ url_for('survey') }}" class="mode-card mc-s" style="text-decoration:none">
+      <div class="mc-bar"></div>
+      <div class="mc-icon">📊</div>
+      <div class="mc-title">Sondage Fan</div>
+      <p class="mc-desc">Partagez vos préférences et animés favoris. Obtenez votre profil fan personnalisé.</p>
+      <span class="mc-cta">Démarrer →</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

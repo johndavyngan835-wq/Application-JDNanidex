@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Admin — Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <div class="aside">
+    <div class="aside-logo">
+      <svg width="26" height="26" viewBox="0 0 44 44" fill="none">
+        <ellipse cx="22" cy="10" rx="13" ry="4.2" fill="url(#as1)"/>
+        <rect x="9" y="10" width="26" height="10" fill="url(#as1)" opacity=".6"/>
+        <ellipse cx="22" cy="20" rx="13" ry="4.2" fill="url(#as1)" opacity=".7"/>
+        <circle cx="22" cy="20" r="3.4" fill="url(#as2)"/>
+        <circle cx="22" cy="20" r="1.5" fill="#04040e"/>
+        <defs>
+          <linearGradient id="as1" x1="9" y1="0" x2="35" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></linearGradient>
+          <radialGradient id="as2"><stop stop-color="#bf00ff"/><stop offset="1" stop-color="#0055ff"/></radialGradient>
+        </defs>
+      </svg>
+      <div class="aside-logo-name">JDN AniDex</div>
+    </div>
+    <div class="aside-sec">Navigation</div>
+    <a href="{{ url_for('admin_dashboard') }}"  class="aside-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">🎯 Questions Quiz</a>
+    <a href="{{ url_for('admin_responses') }}"   class="aside-item {% if request.endpoint == 'admin_responses' %}active{% endif %}">📊 Réponses & Profils</a>
+    <a href="{{ url_for('admin_statistics') }}"  class="aside-item {% if request.endpoint == 'admin_statistics' %}active{% endif %}">📈 Analyse Statistique</a>
+    <a href="{{ url_for('export_csv') }}"        class="aside-item">📥 Export CSV</a>
+    <div class="aside-sec">Compte</div>
+    <a href="{{ url_for('admin_logout') }}"     class="aside-item">🚪 Déconnexion</a>
+  </div>
+
+  <div class="admin-main">
+    <div class="adm-topbar">
+      <div class="adm-title">Gestion des Questions</div>
+      <button class="btn-add" onclick="document.getElementById('modal-overlay').classList.add('active')">+ Ajouter</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-c"><div class="stat-l">Questions</div><div class="stat-v">{{ stats.total_questions }}</div><div class="stat-s">actives</div></div>
+      <div class="stat-c"><div class="stat-l">Participants</div><div class="stat-v">{{ stats.total_responses }}</div><div class="stat-s">total</div></div>
+      <div class="stat-c"><div class="stat-l">Score moyen</div><div class="stat-v">{{ stats.avg_score }}</div><div class="stat-s">/ 10</div></div>
+      <div class="stat-c"><div class="stat-l">Profils générés</div><div class="stat-v">{{ stats.total_responses }}</div><div class="stat-s">classifiés</div></div>
+    </div>
+
+    <!-- Questions list -->
+    <div class="sec-hd">Questions du quiz ({{ questions|length }})</div>
+    <div class="q-list">
+      {% for q in questions[:30] %}
+      <div class="q-row">
+        <div class="q-idx">{{ loop.index }}</div>
+        <div class="q-inf">
+          <div class="q-txt">{{ q.text[:80] }}{% if q.text|length > 80 %}…{% endif %}</div>
+          <span class="q-badge">{{ q.category }}</span>
+        </div>
+        <div class="q-acts">
+          <button class="icon-btn" onclick="deleteQ({{ q.id }})" title="Supprimer">✕</button>
+        </div>
+      </div>
+      {% endfor %}
+      {% if questions|length > 30 %}
+      <div style="padding:1rem;text-align:center;color:var(--mut);font-size:.8rem">
+        … et {{ questions|length - 30 }} autres questions en base
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ajout question -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('active')">✕</button>
+    <div class="modal-title">Nouvelle Question</div>
+    <div class="m-group"><label class="m-label">Question</label><input class="m-input" id="mq" placeholder="Ex: Quel est le vrai nom de Light Yagami ?"></div>
+    <div class="m-group"><label class="m-label">Option A (bonne réponse)</label><input class="m-input" id="ma" placeholder="Lawliet"></div>
+    <div class="m-group"><label class="m-label">Option B</label><input class="m-input" id="mb" placeholder="Option B"></div>
+    <div class="m-group"><label class="m-label">Option C</label><input class="m-input" id="mc" placeholder="Option C"></div>
+    <div class="m-group"><label class="m-label">Option D</label><input class="m-input" id="md" placeholder="Option D"></div>
+    <div class="m-group"><label class="m-label">Catégorie</label>
+      <select class="m-sel" id="mcat">
+        <option>Shōnen</option><option>Seinen</option><option>Isekai</option>
+        <option>Shōjo</option><option>Slice of Life</option><option>Mecha</option>
+        <option>Sport</option><option>Thriller</option><option>Fantasy</option>
+        <option>Science-Fiction</option><option>Comédie</option><option>Magical Girl</option>
+        <option>Historique</option><option>Studio Ghibli</option><option>Horreur</option>
+        <option>Mondial</option>
+      </select>
+    </div>
+    <div class="m-group"><label class="m-label">Explication (optionnel)</label><input class="m-input" id="mexpl" placeholder="Explication courte de la réponse…"></div>
+    <div class="m-actions">
+      <button class="btn-mc btn-cancel" onclick="document.getElementById('modal-overlay').classList.remove('active')">Annuler</button>
+      <button class="btn-mc btn-ok" onclick="addQ()">Ajouter ✓</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function addQ() {
+  const data = {
+    text: document.getElementById('mq').value,
+    option_a: document.getElementById('ma').value,
+    option_b: document.getElementById('mb').value,
+    option_c: document.getElementById('mc').value,
+    option_d: document.getElementById('md').value,
+    correct_answer: document.getElementById('ma').value,
+    category: document.getElementById('mcat').value,
+    explanation: document.getElementById('mexpl').value
+  };
+  if (!data.text || !data.option_a) { alert('Remplissez au moins la question et la bonne réponse.'); return; }
+  const res = await fetch('/admin/api/questions', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  });
+  if ((await res.json()).success) location.reload();
+}
+
+async function deleteQ(id) {
+  if (!confirm('Supprimer cette question définitivement ?')) return;
+  const res = await fetch('/admin/api/questions/' + id, { method: 'DELETE' });
+  if ((await res.json()).success) location.reload();
+}
+</script>
+{% endblock %}

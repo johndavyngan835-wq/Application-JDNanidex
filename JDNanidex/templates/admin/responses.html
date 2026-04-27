@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin — Réponses{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <div class="aside">
+    <div class="aside-logo">
+      <div class="aside-logo-name">JDN AniDex</div>
+    </div>
+    <div class="aside-sec">Navigation</div>
+    <a href="{{ url_for('admin_dashboard') }}" class="aside-item">🎯 Questions Quiz</a>
+    <a href="{{ url_for('admin_responses') }}" class="aside-item active">📊 Réponses & Profils</a>
+    <a href="{{ url_for('admin_statistics') }}" class="aside-item">📈 Analyse Statistique</a>
+    <a href="{{ url_for('export_csv') }}" class="aside-item">📥 Export CSV</a>
+    <div class="aside-sec">Compte</div>
+    <a href="{{ url_for('admin_logout') }}" class="aside-item">🚪 Déconnexion</a>
+  </div>
+
+  <div class="admin-main">
+    <div class="adm-topbar">
+      <div class="adm-title">Réponses & Profils</div>
+      <a href="{{ url_for('export_csv') }}" class="btn-add" style="text-decoration:none">📥 Export CSV</a>
+    </div>
+
+    <div class="resp-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Date</th><th>Mode</th>
+            <th>Score</th><th>Profil</th><th>Résumé</th><th>Recommandations</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in responses %}
+          <tr>
+            <td>{{ '%03d'|format(r.id) }}</td>
+            <td style="font-size:.75rem">{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ r.mode }}</td>
+            <td>{% if r.score is not none %}{{ r.score }}/10{% else %}—{% endif %}</td>
+            <td>
+              {% if r.profile %}
+                <span class="tcat {% if 'Otaku' in r.profile %}pp-otaku{% elif 'Expert' in r.profile %}pp-expert{% elif 'Shōnen' in r.profile %}pp-shonen{% elif 'Casual' in r.profile %}pp-casual{% else %}pp-newbie{% endif %}">
+                  {{ r.profile }}
+                </span>
+              {% endif %}
+            </td>
+            <td style="font-size:.75rem;color:var(--mut);max-width:200px">
+              {{ (r.summary or '')[:80] }}{% if r.summary and r.summary|length > 80 %}…{% endif %}
+            </td>
+            <td style="font-size:.75rem;color:var(--f4)">
+              {% for reco in r.recos_list %}{{ reco.titre }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" style="text-align:center;color:var(--mut);padding:2rem">Aucune réponse pour l'instant.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
