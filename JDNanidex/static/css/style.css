@@ -234,6 +234,7 @@ nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;
 
 /* ── SURVEY ── */
 .sv-header{margin-bottom:2.5rem;}
+.sv-section-title{font-family:'Black Ops One',cursive;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--f4);margin:2rem 0 .8rem;padding:.4rem .8rem;border-left:3px solid var(--f4);background:rgba(0,204,255,.06);border-radius:0 6px 6px 0;}
 .sv-header h2{font-family:'Black Ops One',cursive;font-size:1.6rem;
   background:var(--grd2);-webkit-background-clip:text;
   -webkit-text-fill-color:transparent;background-clip:text;
