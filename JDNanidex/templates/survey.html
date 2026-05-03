@@ -1,52 +1,97 @@
 {% extends "base.html" %}
-{% block title %}Sondage Fan{% endblock %}
+{% block title %}Enregistrer des Données{% endblock %}
 
 {% block content %}
-<div class="inner-wrap active" style="max-width:680px">
+<div class="inner-wrap active" style="max-width:720px">
   <a href="{{ url_for('index') }}" class="btn-back">← Retour</a>
 
   <div class="sv-header">
-    <h2>Sondage Fan d'Animés</h2>
-    <p>Répondez à quelques questions — votre profil fan unique vous attend.</p>
+    <h2>ENREGISTRER DES DONNÉES</h2>
+    <p>Remplissez ce formulaire. Vos réponses alimentent la base de données statistique de la communauté AniDex.</p>
   </div>
 
-  <!-- Q1 : Animé préféré -->
-  <div class="sv-group">
-    <label class="sv-label">Votre animé préféré de tous les temps ?</label>
-    <textarea class="sv-field" id="sv-fav" rows="2"
-      placeholder="Ex: Fullmetal Alchemist Brotherhood…"
-      style="resize:none"></textarea>
-  </div>
+  <!-- Section 1 : Profil -->
+  <div class="sv-section-title">① Profil</div>
 
-  <!-- Q2 : Genre -->
   <div class="sv-group">
-    <label class="sv-label">Votre genre d'animé favori ?</label>
-    <div class="sv-radios" id="sv-genre">
-      {% for genre in ['Shōnen (action/aventure)', 'Seinen (adulte/psychologique)',
-                       'Isekai (autre monde)', 'Shōjo (romance)',
-                       'Slice of Life', 'Mecha', 'Horreur', 'Sport'] %}
-      <label class="sv-radio">
-        <input type="radio" name="genre" value="{{ genre }}"> {{ genre }}
-      </label>
+    <label class="sv-label">Tranche d'âge</label>
+    <div class="sv-radios" id="sv-age">
+      {% for a in ['Moins de 15 ans', '15–18 ans', '19–25 ans', '26–35 ans', '36–45 ans', '45 ans et +'] %}
+      <label class="sv-radio"><input type="radio" name="age" value="{{ a }}"> {{ a }}</label>
       {% endfor %}
     </div>
   </div>
 
-  <!-- Q3 : Fréquence -->
   <div class="sv-group">
-    <label class="sv-label">Épisodes regardés par semaine ?</label>
+    <label class="sv-label">Genre</label>
+    <div class="sv-radios" id="sv-gender">
+      {% for g in ['Homme', 'Femme', 'Non-binaire', 'Préfère ne pas répondre'] %}
+      <label class="sv-radio"><input type="radio" name="gender" value="{{ g }}"> {{ g }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Section 2 : Habitudes -->
+  <div class="sv-section-title">② Habitudes de visionnage</div>
+
+  <div class="sv-group">
+    <label class="sv-label">Épisodes regardés par semaine</label>
     <div class="sv-radios" id="sv-freq">
-      {% for f in ['1 à 5', '6 à 15', '16 à 30', '30+', 'Binge-watching uniquement'] %}
-      <label class="sv-radio">
-        <input type="radio" name="freq" value="{{ f }}"> {{ f }}
-      </label>
+      {% for f in ['0–2', '3–5', '6–10', '11–20', '20+'] %}
+      <label class="sv-radio"><input type="radio" name="freq" value="{{ f }}"> {{ f }}</label>
       {% endfor %}
     </div>
   </div>
 
-  <!-- Q4 : Note passion -->
   <div class="sv-group">
-    <label class="sv-label">Notez votre passion pour les animés</label>
+    <label class="sv-label">Depuis combien de temps regardez-vous des animés ?</label>
+    <div class="sv-radios" id="sv-since">
+      {% for s in ['Moins de 1 an', '1–3 ans', '3–5 ans', '5–10 ans', 'Plus de 10 ans'] %}
+      <label class="sv-radio"><input type="radio" name="since" value="{{ s }}"> {{ s }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="sv-group">
+    <label class="sv-label">Plateforme principale utilisée</label>
+    <div class="sv-radios" id="sv-platform">
+      {% for p in ['Crunchyroll', 'Netflix', 'ADN (AniméDigiNetwork)', 'YouTube', 'Torrent / DDL', 'Autre'] %}
+      <label class="sv-radio"><input type="radio" name="platform" value="{{ p }}"> {{ p }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Section 3 : Préférences -->
+  <div class="sv-section-title">③ Préférences</div>
+
+  <div class="sv-group">
+    <label class="sv-label">Genre d'animé favori</label>
+    <div class="sv-radios" id="sv-genre">
+      {% for genre in ['Shōnen', 'Seinen', 'Isekai', 'Shōjo', 'Slice of Life', 'Mecha', 'Horreur', 'Sport', 'Fantastique', 'Science-Fiction'] %}
+      <label class="sv-radio"><input type="radio" name="genre" value="{{ genre }}"> {{ genre }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="sv-group">
+    <label class="sv-label">Studio d'animation préféré</label>
+    <div class="sv-radios" id="sv-studio">
+      {% for st in ['Mappa', 'Ufotable', 'Wit Studio', 'Kyoto Animation', 'Bones', 'Madhouse', 'A-1 Pictures', 'Autre / Pas de préférence'] %}
+      <label class="sv-radio"><input type="radio" name="studio" value="{{ st }}"> {{ st }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="sv-group">
+    <label class="sv-label">Animé préféré de tous les temps</label>
+    <input class="sv-field" type="text" id="sv-fav" placeholder="Ex: Fullmetal Alchemist Brotherhood…">
+  </div>
+
+  <!-- Section 4 : Passion -->
+  <div class="sv-section-title">④ Mesure de passion</div>
+
+  <div class="sv-group">
+    <label class="sv-label">Notez votre passion pour les animés (1 = passable → 5 = ultra-passionné)</label>
     <div class="sv-stars" id="sv-stars">
       {% for i in range(1, 6) %}
       <span class="sv-star" data-val="{{ i }}" onclick="setStar({{ i }})">☆</span>
@@ -54,15 +99,34 @@
     </div>
   </div>
 
-  <!-- Q5 : Recommandation -->
   <div class="sv-group">
-    <label class="sv-label">Un animé que vous recommanderiez absolument ?</label>
-    <textarea class="sv-field" id="sv-reco" rows="2"
-      placeholder="Titre + pourquoi…"
-      style="resize:none"></textarea>
+    <label class="sv-label">Avez-vous déjà visité une convention animé ?</label>
+    <div class="sv-radios" id="sv-convention">
+      {% for c in ['Oui, plusieurs fois', 'Oui, une fois', 'Non, mais je compte y aller', 'Non'] %}
+      <label class="sv-radio"><input type="radio" name="convention" value="{{ c }}"> {{ c }}</label>
+      {% endfor %}
+    </div>
   </div>
 
-  <button class="sv-submit" onclick="submitSurvey()">Obtenir mon profil →</button>
+  <div class="sv-group">
+    <label class="sv-label">Possédez-vous des produits dérivés (figurines, posters, mangas…) ?</label>
+    <div class="sv-radios" id="sv-merch">
+      {% for m in ['Oui, beaucoup', 'Oui, quelques-uns', 'Non, mais envisagé', 'Non'] %}
+      <label class="sv-radio"><input type="radio" name="merch" value="{{ m }}"> {{ m }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Section 5 : Commentaire -->
+  <div class="sv-section-title">⑤ Commentaire (optionnel)</div>
+  <div class="sv-group">
+    <label class="sv-label">Un animé que vous recommanderiez + pourquoi</label>
+    <textarea class="sv-field" id="sv-reco" rows="3" placeholder="Titre + raison…" style="resize:vertical"></textarea>
+  </div>
+
+  <div id="sv-error" style="display:none;color:#ff4d6d;font-size:.85rem;margin:.5rem 0;padding:.6rem 1rem;background:rgba(255,77,109,.1);border-radius:8px;border:1px solid rgba(255,77,109,.25)"></div>
+
+  <button class="sv-submit" onclick="submitSurvey()">Enregistrer mes données →</button>
 </div>
 {% endblock %}
 
@@ -77,18 +141,47 @@ function setStar(v) {
   });
 }
 
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function showError(msg) {
+  const el = document.getElementById('sv-error');
+  el.style.display = 'block';
+  el.textContent = msg;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 async function submitSurvey() {
-  const genre = document.querySelector('input[name="genre"]:checked');
-  const freq  = document.querySelector('input[name="freq"]:checked');
+  document.getElementById('sv-error').style.display = 'none';
+  const age        = getRadio('age');
+  const gender     = getRadio('gender');
+  const freq       = getRadio('freq');
+  const since      = getRadio('since');
+  const platform   = getRadio('platform');
+  const genre      = getRadio('genre');
+  const studio     = getRadio('studio');
+  const convention = getRadio('convention');
+  const merch      = getRadio('merch');
+  const fav        = document.getElementById('sv-fav').value.trim();
+  const reco       = document.getElementById('sv-reco').value.trim();
+
+  if (!age || !freq || !genre || starVal === 0) {
+    showError("Merci de remplir au minimum : tranche d'âge, fréquence de visionnage, genre favori et note de passion.");
+    return;
+  }
+
   const surveyData = {
-    fav:   document.getElementById('sv-fav').value,
-    genre: genre ? genre.value : '',
-    freq:  freq  ? freq.value  : '',
-    rate:  starVal + '/5',
-    reco:  document.getElementById('sv-reco').value
+    age, gender, freq, since, platform,
+    genre, studio, convention, merch,
+    fav, reco,
+    rate: String(starVal)
   };
+
   document.querySelector('.inner-wrap').style.display = 'none';
   showProc();
+
   try {
     const res = await fetch('/api/analyze', {
       method: 'POST',
@@ -96,14 +189,14 @@ async function submitSurvey() {
       body: JSON.stringify({ mode: 'sondage', survey_data: surveyData })
     });
     const data = await res.json();
-    setTimeout(() => showResults(data, 'Sondage', null), 1000);
+    setTimeout(() => showResults(data, 'Données enregistrées', null), 800);
   } catch(e) {
     setTimeout(() => showResults({
       profil: 'Fan Casual', emoji: '🌸', confiance: 80,
-      resume: 'Fan aux goûts éclectiques.', tags: ['anime','fan'],
-      scoreMsg: 'Profil généré !',
+      resume: 'Données enregistrées avec succès.', tags: ['anime','fan'],
+      scoreMsg: 'Merci pour votre contribution !',
       recommandations: [{titre:'Demon Slayer',genre:'Shōnen'}]
-    }, 'Sondage', null), 2500);
+    }, 'Données enregistrées', null), 1500);
   }
 }
 </script>
