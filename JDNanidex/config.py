@@ -14,7 +14,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', 'VOTRE_CLE_API_ICI')
-    ADMIN_USERNAME     = os.environ.get('ADMIN_USERNAME', 'admin')
-    ADMIN_PASSWORD     = os.environ.get('ADMIN_PASSWORD', 'admin123')
+    ADMIN_USERNAME     = os.environ.get('ADMIN_USERNAME', 'john')
+    ADMIN_PASSWORD     = os.environ.get('ADMIN_PASSWORD', 'johnadmin')
     QUIZ_QUESTIONS_COUNT = 10
     PERMANENT_SESSION_LIFETIME = 3600
