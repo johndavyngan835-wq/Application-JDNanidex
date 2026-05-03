@@ -38,60 +38,146 @@
       <div class="stat-c"><div class="stat-l">Participants</div><div class="stat-v" id="kpi-total">—</div><div class="stat-s">total</div></div>
       <div class="stat-c"><div class="stat-l">Score moyen</div><div class="stat-v" id="kpi-avg">—</div><div class="stat-s">/ 10</div></div>
       <div class="stat-c"><div class="stat-l">Écart-type</div><div class="stat-v" id="kpi-std">—</div><div class="stat-s">dispersion</div></div>
-      <div class="stat-c"><div class="stat-l">Médiane</div><div class="stat-v" id="kpi-med">—</div><div class="stat-s">/ 10</div></div>
+      <div class="stat-c"><div class="stat-l">Passion moy.</div><div class="stat-v" id="kpi-passion">—</div><div class="stat-s">/ 5 étoiles</div></div>
     </div>
 
-    <!-- Charts Grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;">
+    <!-- Onglets -->
+    <div style="display:flex;gap:.5rem;margin:1.5rem 0 1rem;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:.5rem;">
+      <button class="tab-btn active" onclick="switchTab('quiz')">⚔️ Données Quiz</button>
+      <button class="tab-btn" onclick="switchTab('survey')">📊 Données Sondage</button>
+    </div>
 
-      <!-- Distribution des scores -->
-      <div class="stat-card">
-        <div class="stat-card-title">Distribution des Scores (Quiz)</div>
-        <canvas id="chartScores" height="220"></canvas>
+    <!-- ══════ TAB QUIZ ══════ -->
+    <div id="tab-quiz">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-card-title">Distribution des Scores (Quiz)</div>
+          <canvas id="chartScores" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Répartition des Profils</div>
+          <canvas id="chartProfils" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Participation — 7 derniers jours</div>
+          <canvas id="chartTrend" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Mode de Participation (Quiz vs Sondage)</div>
+          <canvas id="chartMode" height="220"></canvas>
+        </div>
       </div>
 
-      <!-- Répartition des profils -->
-      <div class="stat-card">
-        <div class="stat-card-title">Répartition des Profils</div>
-        <canvas id="chartProfils" height="220"></canvas>
+      <!-- Stats descriptives -->
+      <div class="stat-card" style="margin-top:1.5rem;">
+        <div class="stat-card-title">Statistiques Descriptives — Scores Quiz</div>
+        <table class="stat-table">
+          <thead><tr><th>Indicateur</th><th>Valeur</th><th>Description</th></tr></thead>
+          <tbody id="detail-body">
+            <tr><td colspan="3" style="text-align:center;color:var(--mut)">Chargement…</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <!-- Tendance temporelle -->
-      <div class="stat-card">
-        <div class="stat-card-title">Participation (7 derniers jours)</div>
-        <canvas id="chartTrend" height="220"></canvas>
-      </div>
-
-      <!-- Quiz vs Sondage -->
-      <div class="stat-card">
-        <div class="stat-card-title">Mode de Participation</div>
-        <canvas id="chartMode" height="220"></canvas>
+      <!-- Genres populaires -->
+      <div class="stat-card" style="margin-top:1.5rem;">
+        <div class="stat-card-title">Genres / Catégories Recommandés</div>
+        <div id="genres-chart" style="display:flex;flex-wrap:wrap;gap:.6rem;padding:.5rem 0;"></div>
       </div>
     </div>
 
-    <!-- Tableau stats détaillées -->
-    <div class="stat-card" style="margin-top:1.5rem;">
-      <div class="stat-card-title">Statistiques Descriptives Détaillées</div>
-      <table class="stat-table" id="detail-table">
-        <thead>
-          <tr><th>Indicateur</th><th>Valeur</th><th>Description</th></tr>
-        </thead>
-        <tbody id="detail-body">
-          <tr><td colspan="3" style="text-align:center;color:var(--mut)">Chargement…</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- ══════ TAB SONDAGE ══════ -->
+    <div id="tab-survey" style="display:none;">
 
-    <!-- Catégories populaires -->
-    <div class="stat-card" style="margin-top:1.5rem;">
-      <div class="stat-card-title">Genres / Catégories Recommandés</div>
-      <div id="genres-chart" style="display:flex;flex-wrap:wrap;gap:.6rem;padding:.5rem 0;"></div>
-    </div>
+      <!-- KPI sondage -->
+      <div class="stats-row" style="margin-bottom:1.5rem;">
+        <div class="stat-c"><div class="stat-l">Répondants</div><div class="stat-v" id="sv-kpi-total">—</div><div class="stat-s">sondage</div></div>
+        <div class="stat-c"><div class="stat-l">Passion moy.</div><div class="stat-v" id="sv-kpi-passion">—</div><div class="stat-s">/ 5</div></div>
+        <div class="stat-c"><div class="stat-l">Genre favori</div><div class="stat-v" id="sv-kpi-genre" style="font-size:1rem">—</div><div class="stat-s">top genre</div></div>
+        <div class="stat-c"><div class="stat-l">Plateforme #1</div><div class="stat-v" id="sv-kpi-platform" style="font-size:.9rem">—</div><div class="stat-s">top service</div></div>
+      </div>
 
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-card-title">Tranche d'âge des répondants</div>
+          <canvas id="chartAge" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Genre des répondants</div>
+          <canvas id="chartGender" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Fréquence de visionnage (épisodes/semaine)</div>
+          <canvas id="chartFreq" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Ancienneté dans les animés</div>
+          <canvas id="chartSince" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Plateforme principale utilisée</div>
+          <canvas id="chartPlatform" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Genre d'animé favori</div>
+          <canvas id="chartGenrePref" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Studio d'animation préféré</div>
+          <canvas id="chartStudio" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Distribution de la passion (⭐ 1–5)</div>
+          <canvas id="chartPassion" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Participation aux conventions</div>
+          <canvas id="chartConvention" height="220"></canvas>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Possession de produits dérivés</div>
+          <canvas id="chartMerch" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Tableau animés favoris -->
+      <div class="stat-card" style="margin-top:1.5rem;">
+        <div class="stat-card-title">Top Animés Favoris Cités</div>
+        <table class="stat-table">
+          <thead><tr><th>#</th><th>Animé</th><th>Occurrences</th><th>Barre</th></tr></thead>
+          <tbody id="fav-animes-body">
+            <tr><td colspan="4" style="text-align:center;color:var(--mut)">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Courbe tendance sondage -->
+      <div class="stat-card" style="margin-top:1.5rem;">
+        <div class="stat-card-title">Corrélation Passion × Fréquence de visionnage</div>
+        <canvas id="chartCorrel" height="200"></canvas>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <style>
+.tab-btn {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  color: var(--mut, #888);
+  padding: .45rem 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 600;
+  transition: all .2s;
+}
+.tab-btn.active, .tab-btn:hover {
+  background: rgba(191,0,255,.15);
+  border-color: rgba(191,0,255,.4);
+  color: #fff;
+}
 .stat-card {
   background: var(--card, #0d0d1a);
   border: 1px solid var(--bdr, rgba(255,255,255,.08));
@@ -106,195 +192,287 @@
   color: var(--mut, #888);
   margin-bottom: 1rem;
 }
-.stat-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .85rem;
-}
-.stat-table th {
-  text-align: left;
-  padding: .5rem .75rem;
-  border-bottom: 1px solid var(--bdr, rgba(255,255,255,.08));
-  color: var(--mut, #888);
-  font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-.stat-table td {
-  padding: .55rem .75rem;
-  border-bottom: 1px solid var(--bdr, rgba(255,255,255,.05));
-}
-.stat-table tr:last-child td { border-bottom: none; }
-.genre-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  background: rgba(191,0,255,.12);
-  border: 1px solid rgba(191,0,255,.25);
-  border-radius: 999px;
-  padding: .3rem .8rem;
-  font-size: .8rem;
-  font-weight: 600;
-}
-.genre-pill span { color: var(--mut, #888); font-size: .72rem; font-weight: 400; }
+.stat-table { width:100%;border-collapse:collapse;font-size:.85rem; }
+.stat-table th { text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--bdr,rgba(255,255,255,.08));color:var(--mut,#888);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em; }
+.stat-table td { padding:.55rem .75rem;border-bottom:1px solid var(--bdr,rgba(255,255,255,.05)); }
+.stat-table tr:last-child td { border-bottom:none; }
+.genre-pill { display:inline-flex;align-items:center;gap:.4rem;background:rgba(191,0,255,.12);border:1px solid rgba(191,0,255,.25);border-radius:999px;padding:.3rem .8rem;font-size:.8rem;font-weight:600; }
+.genre-pill span { color:var(--mut,#888);font-size:.72rem;font-weight:400; }
+.bar-fill { height:8px;background:linear-gradient(90deg,rgba(191,0,255,.8),rgba(0,85,255,.8));border-radius:4px;transition:width .6s; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 let charts = {};
+let globalData = null;
 
 const COLORS = [
-  'rgba(191,0,255,0.8)',
-  'rgba(0,85,255,0.8)',
-  'rgba(0,210,255,0.8)',
-  'rgba(255,80,180,0.8)',
-  'rgba(255,180,0,0.8)',
-  'rgba(0,255,160,0.8)',
+  'rgba(191,0,255,0.8)','rgba(0,85,255,0.8)','rgba(0,210,255,0.8)',
+  'rgba(255,80,180,0.8)','rgba(255,180,0,0.8)','rgba(0,255,160,0.8)',
+  'rgba(255,120,0,0.8)','rgba(80,255,120,0.8)','rgba(255,60,60,0.8)','rgba(120,80,255,0.8)'
 ];
-const BORDER = COLORS.map(c => c.replace('0.8','1'));
 
 Chart.defaults.color = '#888';
 Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
 
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function switchTab(tab) {
+  document.getElementById('tab-quiz').style.display   = tab === 'quiz'   ? '' : 'none';
+  document.getElementById('tab-survey').style.display = tab === 'survey' ? '' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'quiz') || (i === 1 && tab === 'survey'));
+  });
+  if (tab === 'survey' && globalData) buildSurveyCharts(globalData.survey);
+}
+
+function makeBar(ctx, labels, values, title='') {
+  return new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: title, data: values,
+        backgroundColor: COLORS.slice(0, labels.length),
+        borderRadius: 6, borderSkipped: false }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { ticks: { stepSize: 1 }, beginAtZero: true }, x: { grid: { display: false } } }
+    }
+  });
+}
+
+function makeDoughnut(ctx, labels, values) {
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: COLORS, borderWidth: 2, hoverOffset: 8 }] },
+    options: { responsive: true, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } } }
+  });
+}
+
+function makePie(ctx, labels, values) {
+  return new Chart(ctx, {
+    type: 'pie',
+    data: { labels, datasets: [{ data: values, backgroundColor: COLORS, borderWidth: 2, hoverOffset: 6 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+  });
+}
+
+function buildSurveyCharts(sv) {
+  if (!sv) return;
+
+  // KPIs
+  document.getElementById('sv-kpi-total').textContent   = sv.total || '0';
+  document.getElementById('sv-kpi-passion').textContent = sv.passion_avg ?? '—';
+  const topGenre   = Object.entries(sv.genre_pref_distribution || {}).sort((a,b)=>b[1]-a[1])[0];
+  const topPlatform= Object.entries(sv.platform_distribution   || {}).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('sv-kpi-genre').textContent    = topGenre    ? topGenre[0]    : '—';
+  document.getElementById('sv-kpi-platform').textContent = topPlatform ? topPlatform[0] : '—';
+
+  const AGE_ORDER = ['Moins de 15 ans','15–18 ans','19–25 ans','26–35 ans','36–45 ans','45 ans et +'];
+  const FREQ_ORDER= ['0–2','3–5','6–10','11–20','20+'];
+  const SINCE_ORDER=['Moins de 1 an','1–3 ans','3–5 ans','5–10 ans','Plus de 10 ans'];
+
+  function orderedData(dist, order) {
+    return { labels: order, values: order.map(k => dist[k] || 0) };
+  }
+  function dictData(dist) {
+    const entries = Object.entries(dist).sort((a,b)=>b[1]-a[1]);
+    return { labels: entries.map(e=>e[0]), values: entries.map(e=>e[1]) };
+  }
+
+  // Âge
+  destroyChart('age');
+  const ageD = orderedData(sv.age_distribution, AGE_ORDER);
+  charts.age = makeBar(document.getElementById('chartAge').getContext('2d'), ageD.labels, ageD.values, 'Répondants');
+
+  // Genre
+  destroyChart('gender');
+  const gD = dictData(sv.gender_distribution);
+  charts.gender = makeDoughnut(document.getElementById('chartGender').getContext('2d'), gD.labels, gD.values);
+
+  // Fréquence
+  destroyChart('freq');
+  const fD = orderedData(sv.freq_distribution, FREQ_ORDER);
+  charts.freq = makeBar(document.getElementById('chartFreq').getContext('2d'), fD.labels, fD.values, 'Répondants');
+
+  // Ancienneté
+  destroyChart('since');
+  const sD = orderedData(sv.since_distribution, SINCE_ORDER);
+  charts.since = makeBar(document.getElementById('chartSince').getContext('2d'), sD.labels, sD.values, 'Répondants');
+
+  // Plateforme
+  destroyChart('platform');
+  const pD = dictData(sv.platform_distribution);
+  charts.platform = makePie(document.getElementById('chartPlatform').getContext('2d'), pD.labels, pD.values);
+
+  // Genre préféré
+  destroyChart('genrepref');
+  const gpD = dictData(sv.genre_pref_distribution);
+  charts.genrepref = makeBar(document.getElementById('chartGenrePref').getContext('2d'), gpD.labels, gpD.values, 'Votes');
+
+  // Studio
+  destroyChart('studio');
+  const stD = dictData(sv.studio_distribution);
+  charts.studio = makeBar(document.getElementById('chartStudio').getContext('2d'), stD.labels, stD.values, 'Votes');
+
+  // Passion
+  destroyChart('passion');
+  const passLabels = ['1 ⭐','2 ⭐⭐','3 ⭐⭐⭐','4 ⭐⭐⭐⭐','5 ⭐⭐⭐⭐⭐'];
+  const passVals   = ['1','2','3','4','5'].map(k => sv.passion_distribution[k] || 0);
+  charts.passion = new Chart(document.getElementById('chartPassion').getContext('2d'), {
+    type: 'bar',
+    data: { labels: passLabels, datasets: [{
+      label: 'Répondants', data: passVals,
+      backgroundColor: passVals.map((_,i)=>`rgba(${[255,200,150,100,50][i]},${[80,120,160,200,255][i]},255,0.8)`),
+      borderRadius: 6, borderSkipped: false
+    }]},
+    options: { responsive: true, plugins: { legend: { display: false } },
+      scales: { y: { ticks:{stepSize:1}, beginAtZero: true }, x: { grid: { display: false } } } }
+  });
+
+  // Convention
+  destroyChart('convention');
+  const cvD = dictData(sv.convention_distribution);
+  charts.convention = makeDoughnut(document.getElementById('chartConvention').getContext('2d'), cvD.labels, cvD.values);
+
+  // Merch
+  destroyChart('merch');
+  const mD = dictData(sv.merch_distribution);
+  charts.merch = makeDoughnut(document.getElementById('chartMerch').getContext('2d'), mD.labels, mD.values);
+
+  // Tableau animés favoris
+  const tbody = document.getElementById('fav-animes-body');
+  const favs = sv.top_fav_animes || [];
+  if (favs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--mut)">Aucun animé favori enregistré.</td></tr>';
+  } else {
+    const maxCount = favs[0][1];
+    tbody.innerHTML = favs.map(([title, count], i) => `
+      <tr>
+        <td style="color:var(--mut)">${i+1}</td>
+        <td><strong>${title}</strong></td>
+        <td style="color:rgba(191,0,255,1);font-weight:700">${count}×</td>
+        <td style="width:40%"><div class="bar-fill" style="width:${Math.round((count/maxCount)*100)}%"></div></td>
+      </tr>`).join('');
+  }
+
+  // Corrélation passion × fréquence (scatter simulé avec données groupées)
+  destroyChart('correl');
+  const freqMap  = { '0–2':1, '3–5':2, '6–10':3, '11–20':4, '20+':5 };
+  const corrData = [];
+  for (const [fk, fv] of Object.entries(sv.freq_distribution || {})) {
+    const x = freqMap[fk] || 0;
+    for (let i = 0; i < fv; i++) {
+      corrData.push({ x, y: sv.passion_avg || 3 });
+    }
+  }
+  charts.correl = new Chart(document.getElementById('chartCorrel').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['0–2 ep/sem','3–5 ep/sem','6–10 ep/sem','11–20 ep/sem','20+ ep/sem'],
+      datasets: [{
+        label: 'Répondants par fréquence', data: FREQ_ORDER.map(k => sv.freq_distribution[k] || 0),
+        backgroundColor: 'rgba(0,210,255,0.6)', borderRadius:6, borderSkipped:false, yAxisID:'y'
+      }, {
+        type: 'line',
+        label: 'Passion moyenne (globale)', data: FREQ_ORDER.map(() => sv.passion_avg || 0),
+        borderColor: 'rgba(191,0,255,1)', backgroundColor:'transparent',
+        pointBackgroundColor:'rgba(191,0,255,1)', pointRadius:4, tension:.3, yAxisID:'y2'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position:'bottom', labels:{ boxWidth:12, font:{ size:11} } } },
+      scales: {
+        y:  { beginAtZero:true, ticks:{stepSize:1}, title:{ display:true, text:'Répondants' } },
+        y2: { position:'right', min:0, max:5, title:{ display:true, text:'Note passion' }, grid:{ display:false } }
+      }
+    }
+  });
 }
 
 async function loadStats() {
   const res = await fetch('/admin/api/statistics');
   const d = await res.json();
+  globalData = d;
 
-  // KPIs
-  document.getElementById('kpi-total').textContent = d.total;
-  document.getElementById('kpi-avg').textContent   = d.score_stats.mean ?? '—';
-  document.getElementById('kpi-std').textContent   = d.score_stats.std  ?? '—';
-  document.getElementById('kpi-med').textContent   = d.score_stats.median ?? '—';
+  // KPIs globaux
+  document.getElementById('kpi-total').textContent   = d.total;
+  document.getElementById('kpi-avg').textContent     = d.score_stats.mean ?? '—';
+  document.getElementById('kpi-std').textContent     = d.score_stats.std  ?? '—';
+  document.getElementById('kpi-passion').textContent = d.survey?.passion_avg ?? '—';
 
-  // Chart 1 — Distribution scores
+  // Chart Scores
   destroyChart('scores');
   const ctxS = document.getElementById('chartScores').getContext('2d');
   const labels = Object.keys(d.score_distribution).map(k => `${k}/10`);
   const values = Object.values(d.score_distribution);
   charts.scores = new Chart(ctxS, {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Participants',
-        data: values,
-        backgroundColor: labels.map((_, i) => {
-          const v = parseInt(labels[i]);
-          return v >= 8 ? 'rgba(0,255,160,0.7)' : v >= 5 ? 'rgba(0,85,255,0.7)' : 'rgba(191,0,255,0.7)';
-        }),
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { stepSize: 1 }, beginAtZero: true },
-        x: { grid: { display: false } }
-      }
-    }
+    data: { labels, datasets: [{ label: 'Participants', data: values,
+      backgroundColor: labels.map(l => { const v=parseInt(l); return v>=8?'rgba(0,255,160,0.7)':v>=5?'rgba(0,85,255,0.7)':'rgba(191,0,255,0.7)'; }),
+      borderRadius:6, borderSkipped:false }]},
+    options: { responsive:true, plugins:{ legend:{ display:false } },
+      scales:{ y:{ticks:{stepSize:1},beginAtZero:true}, x:{grid:{display:false}} } }
   });
 
-  // Chart 2 — Profils
+  // Chart Profils
   destroyChart('profils');
-  const ctxP = document.getElementById('chartProfils').getContext('2d');
-  charts.profils = new Chart(ctxP, {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(d.profiles),
-      datasets: [{
-        data: Object.values(d.profiles),
-        backgroundColor: COLORS,
-        borderColor: BORDER,
-        borderWidth: 2,
-        hoverOffset: 10,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
-      }
-    }
+  charts.profils = new Chart(document.getElementById('chartProfils').getContext('2d'), {
+    type:'doughnut',
+    data:{ labels:Object.keys(d.profiles), datasets:[{ data:Object.values(d.profiles),
+      backgroundColor:COLORS, borderWidth:2, hoverOffset:10 }]},
+    options:{ responsive:true, plugins:{ legend:{ position:'right', labels:{ boxWidth:12, font:{size:11} } } } }
   });
 
-  // Chart 3 — Tendance 7 jours
+  // Chart Tendance
   destroyChart('trend');
-  const ctxT = document.getElementById('chartTrend').getContext('2d');
-  charts.trend = new Chart(ctxT, {
-    type: 'line',
-    data: {
-      labels: d.trend.map(t => t.date),
-      datasets: [{
-        label: 'Participations',
-        data: d.trend.map(t => t.count),
-        borderColor: 'rgba(191,0,255,1)',
-        backgroundColor: 'rgba(191,0,255,0.12)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: 'rgba(191,0,255,1)',
-        pointRadius: 4,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-    }
+  charts.trend = new Chart(document.getElementById('chartTrend').getContext('2d'), {
+    type:'line',
+    data:{ labels:d.trend.map(t=>t.date), datasets:[{ label:'Participations', data:d.trend.map(t=>t.count),
+      borderColor:'rgba(191,0,255,1)', backgroundColor:'rgba(191,0,255,0.12)', fill:true, tension:.4,
+      pointBackgroundColor:'rgba(191,0,255,1)', pointRadius:4 }]},
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
   });
 
-  // Chart 4 — Mode
+  // Chart Mode
   destroyChart('mode');
-  const ctxM = document.getElementById('chartMode').getContext('2d');
-  charts.mode = new Chart(ctxM, {
-    type: 'pie',
-    data: {
-      labels: ['Quiz', 'Sondage'],
-      datasets: [{
-        data: [d.mode_distribution.quiz || 0, d.mode_distribution.sondage || 0],
-        backgroundColor: ['rgba(0,85,255,0.8)', 'rgba(191,0,255,0.8)'],
-        borderColor: ['rgba(0,85,255,1)', 'rgba(191,0,255,1)'],
-        borderWidth: 2,
-        hoverOffset: 8,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
-    }
+  charts.mode = new Chart(document.getElementById('chartMode').getContext('2d'), {
+    type:'pie',
+    data:{ labels:['Quiz','Sondage'], datasets:[{ data:[d.mode_distribution.quiz||0, d.mode_distribution.sondage||0],
+      backgroundColor:['rgba(0,85,255,0.8)','rgba(191,0,255,0.8)'], borderWidth:2, hoverOffset:8 }]},
+    options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12 } } } }
   });
 
-  // Table détaillée
+  // Table stats descriptives
   const tbody = document.getElementById('detail-body');
   const ss = d.score_stats;
   const rows = [
     ['Total participants', d.total, 'Nombre total de réponses enregistrées'],
-    ['Participants quiz', d.mode_distribution.quiz || 0, 'Ayant complété le quiz'],
-    ['Participants sondage', d.mode_distribution.sondage || 0, 'Ayant complété le sondage'],
-    ['Score moyen', ss.mean ?? 'N/A', 'Moyenne arithmétique des scores /10'],
-    ['Score médian', ss.median ?? 'N/A', '50% des scores sont en-dessous de cette valeur'],
-    ['Écart-type', ss.std ?? 'N/A', 'Mesure de dispersion des scores'],
-    ['Score minimum', ss.min ?? 'N/A', 'Score le plus bas obtenu'],
-    ['Score maximum', ss.max ?? 'N/A', 'Score le plus élevé obtenu'],
-    ['Profil dominant', d.top_profile || 'N/A', 'Profil le plus fréquemment attribué'],
+    ['Participants quiz', d.mode_distribution.quiz||0, 'Ayant complété le quiz'],
+    ['Participants sondage', d.mode_distribution.sondage||0, 'Ayant complété le sondage'],
+    ['Score moyen', ss.mean??'N/A', 'Moyenne arithmétique des scores /10'],
+    ['Score médian', ss.median??'N/A', '50% des scores sont en-dessous de cette valeur'],
+    ['Écart-type', ss.std??'N/A', 'Mesure de dispersion des scores (σ)'],
+    ['Score minimum', ss.min??'N/A', 'Score le plus bas obtenu'],
+    ['Score maximum', ss.max??'N/A', 'Score le plus élevé obtenu'],
+    ['Profil dominant', d.top_profile||'N/A', 'Profil le plus fréquemment attribué'],
+    ['Passion moyenne', d.survey?.passion_avg??'N/A', 'Note de passion moyenne (sondage, /5)'],
   ];
-  tbody.innerHTML = rows.map(([ind, val, desc]) =>
+  tbody.innerHTML = rows.map(([ind,val,desc]) =>
     `<tr><td><strong>${ind}</strong></td><td style="color:rgba(191,0,255,1);font-weight:700">${val}</td><td style="color:var(--mut)">${desc}</td></tr>`
   ).join('');
 
-  // Genres
+  // Genres recommandés
   const gc = document.getElementById('genres-chart');
   gc.innerHTML = '';
-  const genres = d.top_genres || [];
-  if (genres.length === 0) {
+  const genres = d.top_genres||[];
+  if (genres.length===0) {
     gc.innerHTML = '<span style="color:var(--mut);font-size:.85rem">Aucune recommandation enregistrée pour l\'instant.</span>';
   } else {
-    genres.forEach(([genre, count]) => {
+    genres.forEach(([genre,count]) => {
       gc.innerHTML += `<div class="genre-pill">${genre} <span>${count}×</span></div>`;
     });
   }
