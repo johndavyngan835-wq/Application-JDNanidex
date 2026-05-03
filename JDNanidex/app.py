@@ -294,6 +294,22 @@ def analyze():
             survey_data=json.dumps(survey_data) if survey_data else None,
             created_at=datetime.utcnow()
         )
+        # ── Champs détaillés sondage ──
+        if survey_data:
+            response.age          = survey_data.get('age')
+            response.gender       = survey_data.get('gender')
+            response.freq         = survey_data.get('freq')
+            response.since        = survey_data.get('since')
+            response.platform     = survey_data.get('platform')
+            response.genre_pref   = survey_data.get('genre')
+            response.studio       = survey_data.get('studio')
+            response.convention   = survey_data.get('convention')
+            response.merch        = survey_data.get('merch')
+            response.fav_anime    = survey_data.get('fav')
+            try:
+                response.passion_rate = int(survey_data.get('rate', 0))
+            except (ValueError, TypeError):
+                response.passion_rate = None
         db.session.add(response)
         db.session.commit()
     except Exception as e:
@@ -486,6 +502,27 @@ def admin_api_statistics():
                 pass
     top_animes = sorted(anime_counter.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
 
+    # ── Données sondage détaillées ──
+    survey_responses = [r for r in responses if r.mode == 'sondage']
+
+    age_dist       = Counter(r.age for r in survey_responses if r.age)
+    gender_dist    = Counter(r.gender for r in survey_responses if r.gender)
+    freq_dist      = Counter(r.freq for r in survey_responses if r.freq)
+    since_dist     = Counter(r.since for r in survey_responses if r.since)
+    platform_dist  = Counter(r.platform for r in survey_responses if r.platform)
+    genre_pref_dist= Counter(r.genre_pref for r in survey_responses if r.genre_pref)
+    studio_dist    = Counter(r.studio for r in survey_responses if r.studio)
+    convention_dist= Counter(r.convention for r in survey_responses if r.convention)
+    merch_dist     = Counter(r.merch for r in survey_responses if r.merch)
+
+    passion_vals = [r.passion_rate for r in survey_responses if r.passion_rate is not None]
+    passion_dist = Counter(str(v) for v in passion_vals)
+    passion_avg  = round(sum(passion_vals)/len(passion_vals), 2) if passion_vals else None
+
+    # Top animés favoris cités
+    fav_counter = Counter(r.fav_anime for r in survey_responses if r.fav_anime and r.fav_anime.strip())
+    top_favs = fav_counter.most_common(10)
+
     return jsonify({
         'total': total,
         'mode_distribution': dict(mode_dist),
@@ -496,6 +533,21 @@ def admin_api_statistics():
         'trend': trend,
         'top_genres': top_genres,
         'top_animes': top_animes,
+        'survey': {
+            'total': len(survey_responses),
+            'age_distribution': dict(age_dist),
+            'gender_distribution': dict(gender_dist),
+            'freq_distribution': dict(freq_dist),
+            'since_distribution': dict(since_dist),
+            'platform_distribution': dict(platform_dist),
+            'genre_pref_distribution': dict(genre_pref_dist),
+            'studio_distribution': dict(studio_dist),
+            'convention_distribution': dict(convention_dist),
+            'merch_distribution': dict(merch_dist),
+            'passion_distribution': dict(passion_dist),
+            'passion_avg': passion_avg,
+            'top_fav_animes': top_favs,
+        }
     })
 
 
