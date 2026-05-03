@@ -612,7 +612,14 @@ def export_csv():
     resp.headers['Content-Disposition'] = 'attachment; filename=jdn_anidex_responses.csv'
     return resp
 
-
+@app.route('/secret-reset-db-anidex')
+def reset_db():
+    try:
+        db.drop_all()
+        db.create_all()
+        return "✅ Base de données recréée avec succès !"
+    except Exception as e:
+        return f"❌ Erreur : {e}"
 # ──────────────────────────────────────────────
 # Lancement
 # ──────────────────────────────────────────────
