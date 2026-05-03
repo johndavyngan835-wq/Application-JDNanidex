@@ -68,5 +68,18 @@ class Response(db.Model):
     survey_data     = db.Column(db.Text,       nullable=True)    # JSON des réponses sondage
     created_at      = db.Column(db.DateTime,   default=datetime.utcnow)
 
+    # ── Champs détaillés sondage (pour analyse statistique) ──
+    age             = db.Column(db.String(30),  nullable=True)   # Tranche d'âge
+    gender          = db.Column(db.String(30),  nullable=True)   # Genre
+    freq            = db.Column(db.String(20),  nullable=True)   # Épisodes/semaine
+    since           = db.Column(db.String(30),  nullable=True)   # Ancienneté
+    platform        = db.Column(db.String(50),  nullable=True)   # Plateforme
+    genre_pref      = db.Column(db.String(50),  nullable=True)   # Genre favori
+    studio          = db.Column(db.String(50),  nullable=True)   # Studio favori
+    passion_rate    = db.Column(db.Integer,     nullable=True)   # Note de passion 1–5
+    convention      = db.Column(db.String(50),  nullable=True)   # Convention visitée
+    merch           = db.Column(db.String(50),  nullable=True)   # Produits dérivés
+    fav_anime       = db.Column(db.String(100), nullable=True)   # Animé préféré
+
     def __repr__(self):
         return f'<Response {self.id}: {self.mode} | {self.profile}>'
